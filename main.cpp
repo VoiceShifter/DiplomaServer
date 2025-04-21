@@ -4,14 +4,24 @@
 # include <fstream>
 # include <filesystem>
 # include <string>
-# include <QtSql/QSqlDatabase>
-# include <QtSql/QSqlDriver>
-# include <QtSql/QSqlQuery>
+# include "sqlite3.h"
+
+signed int SqlCallback(void* Unused, signed int Counter, char** Results, char** Columns)
+{
+      if (Counter==0)
+      {
+            return 1;
+      }
+      else
+      {
+            return 0;
+      }
+}
+
 void ProcessConenctions(QUdpSocket* Socket)
 {
       unsigned int DataSize{200};
       char Data[DataSize];
-
       std::cout << "Current path is " << std::filesystem::current_path() << '\n';
       for(;;)
       {
@@ -32,7 +42,7 @@ void ProcessConenctions(QUdpSocket* Socket)
                   std::string Token;
                   std::getline(SenderData, Token, '\n');
                   RequestType = Token[0];
-                  std::getline(SenderData, Token, '\0');
+
                   std::string Path{};
                   tDatagram.clear();
                   if (RequestType=='\0')
@@ -43,6 +53,7 @@ void ProcessConenctions(QUdpSocket* Socket)
                   {
                   case 103:
                   {
+                        std::getline(SenderData, Token, '\0');
                         Path+="Files\\";Path+=Token;Path += ".txt";
                         File.open(Path, std::ios_base::in);
                         std::cout << std::boolalpha << File.is_open() << " - file state\n";
@@ -55,6 +66,7 @@ void ProcessConenctions(QUdpSocket* Socket)
                   }
                   case 116:
                   {
+                        std::getline(SenderData, Token, '\0');
                         File.open(Path, std::ios_base::in);
                         Path+="Files\\";Path+=Token;Path += ".txt";
                         std::cout << std::boolalpha << File.is_open() << " - file state\n";
@@ -66,32 +78,32 @@ void ProcessConenctions(QUdpSocket* Socket)
                         break;
                   }
                   case 108:
-                        //Database call
+                  //Database call
+                  {
+                        Checker = 0;
+                        std::string Login{};
+                        std::string Password{};
+                        std::stringstream Queue;
+                        std::getline(SenderData, Login, ' ');
+                        std::getline(SenderData, Password, '\0');
+                        Queue << "select * from Students where Login = '" << Login
+                              << "' and Password = '" << Password << "';";
+                        sqlite3* Database;
+                        sqlite3_open("File\\Diploma.sqlite", &Database);
+                        if (SQLITE_ABORT == sqlite3_exec(Database, Queue.str().c_str(), SqlCallback, nullptr, nullptr))
                         {
-                              std::string Login{std::strtok(const_cast<char*>(Token.c_str()), " ")};
-                              std::string Password{std::strtok(nullptr, "\0 \n")};
-                              QSqlDatabase Students{QSqlDatabase::addDatabase("QSQLITE")};
-                              Students.setDatabaseName("Dimploma.sqlite");
-                              std::stringstream Queue;
-                              Queue << "select * from Students where Login = " << Login
-                                    << "and Password = " << Password << ";";
-                              auto QueueReturn{Students.exec(Queue.str().c_str())};
-                              if (QueueReturn.isValid())
-                              {
-                                    tDatagram.setData(QByteArray::fromStdString("1"));
-                                    Checker = 0;
-                              }
-                              else
-                              {
-                                    tDatagram.setData(QByteArray::fromStdString("0"));
-                                    Checker = 0;
-                              }
-                              break;
+                              tDatagram.setData(QByteArray::fromStdString("0"));
                         }
+                        else
+                        {
+                              tDatagram.setData(QByteArray::fromStdString("1"));
+                        }
+                        break;
+                  }
                   default:
                   {
-                        std::cout << "No such Request\n";
                         Checker = 0;
+                        std::cout << "No such Request\n";
                         break;
                   }
                   }
@@ -111,11 +123,33 @@ void ProcessConenctions(QUdpSocket* Socket)
             }
       }
 }
-
+static int callback(void *NotUsed, int argc, char **argv, char **azColName){
+      int i;
+      for(i=0; i<argc; i++)
+      {
+            printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+      }
+      printf("\n");
+      return 0;
+      }
 int main(int argc, char *argv[])
 {
+
       QUdpSocket *MainSocket = new QUdpSocket;
       MainSocket->bind(QHostAddress::LocalHost, 32323);
       ProcessConenctions(MainSocket);
+      // sqlite3* Database;
+      // if (sqlite3_open("Files\\Diploma.sqlite", &Database))
+      // {
+      //       std::cout << "Cant open database\n";
+      //       return 1;
+      // }
+      // char* ErrorText = 0;
+      // auto Error = sqlite3_exec(Database, "select * from Students where Login = 'email@email.com';", callback, 0, &ErrorText);
+      // if ( Error != SQLITE_OK)
+      // {
+      //       std::cout << ErrorText;
+      // }
+      // sqlite3_close(Database);
       return 0;
 }

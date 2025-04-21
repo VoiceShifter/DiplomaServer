@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(DiplomaServer LANGUAGES CXX)
+project(DiplomaServer LANGUAGES C CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -9,14 +9,18 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_library(Sqlite STATIC sqlite3.c sqlite3.h sqlite3ext.h shell.c)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 
 add_executable(DiplomaServer
   main.cpp
 )
+target_link_libraries(DiplomaServer Sqlite)
 target_link_libraries(DiplomaServer Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(DiplomaServer Qt${QT_VERSION_MAJOR}::Network)
+target_include_directories(Sqlite PUBLIC ${CMAKE_SOURCE_DIR})
+
 target_include_directories(DiplomaServer PRIVATE ${CMAKE_SOURCE_DIR}/Files)
 
 include(GNUInstallDirs)
