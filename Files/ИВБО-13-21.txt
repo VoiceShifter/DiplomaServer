@@ -1,0 +1,78 @@
+D ПОНЕДЕЛЬНИК
+O \ Схемотехника устройств компьютерных систем : T \ Л : M \ Тарасов И.Е. : P \ ауд. A-1 (В-78)
+E \ Схемотехника устройств компьютерных систем : T \ Л : M \ Тарасов И.Е. : P \ ауд. A-1 (В-78)
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+D ВТОРНИК
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+D СРЕДА
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+D ЧЕТВЕРГ
+O \ Проектирование и разработка систем на базе программируемых логических интегральных схем : T \ Л : M \ Борисенко Н.В. : P \ ауд. A-1 (В-78)
+E Empty
+O \ Технологические основы интернета вещей : T \ Л : M \ Жматов Д.В. : P \ ауд. A-1 (В-78)
+E Empty
+O Empty
+E \ Разработка баз данных : T \ Л : M \ Богомольная Г.В. : P \ ауд. A-1 (В-78)
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+D ПЯТНИЦА
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
+D СУББОТА
+O Empty
+E Empty
+O Empty
+E \ Моделирование бизнес-процессов : T \ Л : M \ Ивахник Д.Е. : P \ ауд. A-1 (В-78)
+O \ Архитектура процессоров и микропроцессоров : T \ Л : M \ Бражникова Е.В. : P \ ауд. A-1 (В-78)
+E \ Архитектура процессоров и микропроцессоров : T \ Л : M \ Бражникова Е.В. : P \ ауд. A-1 (В-78)
+O Empty
+E Empty
+O Empty
+E Empty
+O Empty
+E Empty
