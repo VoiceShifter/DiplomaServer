@@ -6,14 +6,38 @@
 # include <string>
 # include "sqlite3.h"
 
-signed int SqlCallback(void* Unused, signed int Counter, char** Results, char** Columns)
+static int callback(void *NotUsed, int argc, char **argv, char **azColName){
+      int i;
+      for(i=0; i<argc; i++)
+      {
+            printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+      }
+      printf("\n");
+      return 0;
+}
+
+static signed int SqlCallback(void* SaveResults, signed int Counter, char** Results, char** Columns)
 {
+      std::string* lSaveResults {static_cast<std::string*>(SaveResults)};
       if (Counter==0)
       {
             return 1;
       }
       else
       {
+            if (*Results[4]=='1')
+            {
+                  lSaveResults->append("1");
+            }
+            else
+            {
+                  std::cout << *Results[4] << '\n';
+                  std::cout << "Username login\n";
+            }            
+            lSaveResults->append("\n");
+            lSaveResults->append(Results[3]);
+            lSaveResults->append("\n");
+            lSaveResults->append(Results[5]);
             return 0;
       }
 }
@@ -89,14 +113,29 @@ void ProcessConenctions(QUdpSocket* Socket)
                         Queue << "select * from Students where Login = '" << Login
                               << "' and Password = '" << Password << "';";
                         sqlite3* Database;
-                        sqlite3_open("File\\Diploma.sqlite", &Database);
-                        if (SQLITE_ABORT == sqlite3_exec(Database, Queue.str().c_str(), SqlCallback, nullptr, nullptr))
+                        auto rc = sqlite3_open("Files\\Diploma.sqlite", &Database);
+                        if (rc)
                         {
+                              fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(Database));
+                              sqlite3_close(Database);
+                              return;
+
+                        }
+                        std::string* Results = new std::string();
+                        char* ErrorMessage{};
+                        rc = sqlite3_exec(Database, Queue.str().c_str(), SqlCallback, Results, &ErrorMessage);
+                        std::cout << Queue.str().c_str() << " - sql query\n";
+                        if (rc!=SQLITE_OK)
+                        {
+                              std::cout << "sqlite returened error\n";
                               tDatagram.setData(QByteArray::fromStdString("0"));
+                              std::cout << ErrorMessage << '\n';
+
                         }
                         else
                         {
-                              tDatagram.setData(QByteArray::fromStdString("1"));
+                              //std::cout << ErrorMessage << '\n';
+                              tDatagram.setData(QByteArray::fromStdString("1" + *Results));
                         }
                         break;
                   }
@@ -120,18 +159,11 @@ void ProcessConenctions(QUdpSocket* Socket)
                   Socket->writeDatagram(tDatagram);
                   std::cout << "Done\n";
                   File.close();
+                  std::cout.flush();
             }
       }
 }
-static int callback(void *NotUsed, int argc, char **argv, char **azColName){
-      int i;
-      for(i=0; i<argc; i++)
-      {
-            printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-      }
-      printf("\n");
-      return 0;
-      }
+
 int main(int argc, char *argv[])
 {
 
